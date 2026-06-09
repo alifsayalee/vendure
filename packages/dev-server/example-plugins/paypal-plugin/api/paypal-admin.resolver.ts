@@ -5,6 +5,10 @@ import {
     TransactionSearchInput,
 } from '../reporting/paypal-reporting.service';
 import {
+    AddShipmentTrackingInput,
+    PayPalShippingService,
+} from '../shipping/paypal-shipping.service';
+import {
     CreateBillingPlanInput,
     PayPalSubscriptionService,
 } from '../subscription/paypal-subscription.service';
@@ -14,6 +18,7 @@ export class PayPalAdminResolver {
     constructor(
         private readonly subscriptionService: PayPalSubscriptionService,
         private readonly reportingService: PayPalReportingService,
+        private readonly shippingService: PayPalShippingService,
     ) {}
 
     @Query()
@@ -77,5 +82,24 @@ export class PayPalAdminResolver {
         @Args() { asOfTime, currencyCode }: { asOfTime?: string; currencyCode?: string },
     ) {
         return this.reportingService.getBalances(asOfTime, currencyCode);
+    }
+
+    // ── UC8 — Shipment Tracking ─────────────────────────────────────────────
+
+    @Mutation()
+    @Allow(Permission.UpdateOrder)
+    addPayPalShipmentTracking(
+        @Args() { orderId, input }: { orderId: string; input: AddShipmentTrackingInput },
+    ) {
+        return this.shippingService.addShipmentTracking(orderId, input);
+    }
+
+    @Mutation()
+    @Allow(Permission.UpdateOrder)
+    async cancelPayPalShipmentTracking(
+        @Args() { orderId, trackerId }: { orderId: string; trackerId: string },
+    ): Promise<boolean> {
+        await this.shippingService.cancelShipmentTracking(orderId, trackerId);
+        return true;
     }
 }

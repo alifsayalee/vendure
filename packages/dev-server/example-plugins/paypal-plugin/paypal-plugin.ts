@@ -5,6 +5,7 @@ import { PayPalShopResolver } from './api/paypal-shop.resolver';
 import { shopApiExtensions } from './api/shop-api.extensions';
 import { paypalPaymentHandler } from './payment/paypal-payment.handler';
 import { PayPalReportingService } from './reporting/paypal-reporting.service';
+import { PayPalShippingService } from './shipping/paypal-shipping.service';
 import { PayPalSubscription } from './subscription/paypal-subscription.entity';
 import { PayPalSubscriptionService } from './subscription/paypal-subscription.service';
 import { PayPalService } from './paypal.service';
@@ -20,11 +21,12 @@ import { PayPalService } from './paypal.service';
  *   UC5 — Partial Refund
  *   UC6 — Subscription Billing (Recurring Payments)
  *   UC7 — Transaction Reporting (search + account balances)
+ *   UC8 — Order Shipment Tracking
  */
 @VendurePlugin({
     imports: [PluginCommonModule],
     entities: [PayPalSubscription],
-    providers: [PayPalService, PayPalSubscriptionService, PayPalReportingService],
+    providers: [PayPalService, PayPalSubscriptionService, PayPalReportingService, PayPalShippingService],
     shopApiExtensions: {
         schema: shopApiExtensions,
         resolvers: [PayPalShopResolver],

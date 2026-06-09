@@ -103,6 +103,27 @@ export const adminApiExtensions = gql`
         paypalBalances(asOfTime: String, currencyCode: String): [PayPalBalance!]!
     }
 
+    # ── UC8 — Shipment Tracking ──────────────────────────────────────────────
+
+    input AddPayPalShipmentTrackingInput {
+        """The PayPal capture ID from the settled payment."""
+        captureId: String!
+        """Carrier tracking number."""
+        trackingNumber: String
+        """PayPal carrier code, e.g. UPS, FEDEX, USPS. Use OTHER + carrierNameOther for unlisted carriers."""
+        carrier: String
+        """Required when carrier is OTHER."""
+        carrierNameOther: String
+        """Send tracking email notification to the buyer."""
+        notifyPayer: Boolean
+    }
+
+    type PayPalShipmentTrackingResult {
+        """PayPal-assigned tracker ID (format: <captureId>-<trackingNumber>)."""
+        trackerId: String!
+        status: String!
+    }
+
     extend type Mutation {
         """UC6 — Create a PayPal billing plan (INACTIVE by default; call activatePayPalBillingPlan next)."""
         createPayPalBillingPlan(input: CreatePayPalBillingPlanInput!): PayPalBillingPlan!
@@ -115,5 +136,11 @@ export const adminApiExtensions = gql`
 
         """UC6 — Retry a failed subscription payment: reactivates the suspended subscription and captures the outstanding balance."""
         capturePayPalSubscriptionPayment(subscriptionId: String!): Boolean!
+
+        """UC8 — Attach shipment tracking to a captured PayPal order."""
+        addPayPalShipmentTracking(orderId: String!, input: AddPayPalShipmentTrackingInput!): PayPalShipmentTrackingResult!
+
+        """UC8 — Cancel the shipment tracking on a PayPal order."""
+        cancelPayPalShipmentTracking(orderId: String!, trackerId: String!): Boolean!
     }
 `;
